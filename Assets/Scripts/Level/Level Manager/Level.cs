@@ -6,6 +6,8 @@ namespace ButchersGames
     {
         [SerializeField] private Transform playerSpawnPoint;
 
+        public Transform PlayerSpawnPoint => playerSpawnPoint;
+
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {

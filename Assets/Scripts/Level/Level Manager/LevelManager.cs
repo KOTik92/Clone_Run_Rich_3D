@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using System;
 using System.Linq;
+using TMPro;
 
 namespace ButchersGames
 {
@@ -27,12 +28,14 @@ namespace ButchersGames
 
         [SerializeField] bool editorMode = false;
         [SerializeField] LevelsList levels;
+        [SerializeField] private PlayerController playerController;
+        [SerializeField] private TextMeshProUGUI textCurrentLevel;
         public List<Level> Levels => levels.lvls;
 
         public event Action OnLevelStarted;
 
 
-        public void Init()
+        public void Awake()
         {
 #if !UNITY_EDITOR
             editorMode = false;
@@ -89,6 +92,7 @@ namespace ButchersGames
             {
                 SelLevelParams(level);
                 CurrentLevelIndex = levelIndex;
+                textCurrentLevel.text = $"Уровень {CurrentLevelIndex}";
             }
         }
 
@@ -124,14 +128,16 @@ namespace ButchersGames
 #if UNITY_EDITOR
             if (Application.isPlaying)
             {
-                Instantiate(level, transform);
+                Level lev = Instantiate(level, transform);
+                playerController.transform.position = lev.PlayerSpawnPoint.position;
             }
             else
             {
                 PrefabUtility.InstantiatePrefab(level, transform);
             }
 #else
-                Instantiate(level, transform);
+                Level lev = Instantiate(level, transform);
+                playerController.transform.position = lev.PlayerSpawnPoint.position;
 #endif
             }
         }

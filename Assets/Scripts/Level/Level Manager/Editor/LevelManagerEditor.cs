@@ -7,7 +7,7 @@ namespace ButchersGames
     [CustomEditor(typeof(LevelManager))]
     public class LevelManagerEditor : Editor
     {
-        private SerializedProperty _editorMode, _lvlList;
+        private SerializedProperty _editorMode, _lvlList, _playerController, _textCurrentLevel;
         private LevelManager _levelManager;
 
         private void Awake()
@@ -19,6 +19,8 @@ namespace ButchersGames
         {
             _editorMode = serializedObject.FindProperty("editorMode");
             _lvlList = serializedObject.FindProperty("levels");
+            _playerController = serializedObject.FindProperty("playerController");
+            _textCurrentLevel = serializedObject.FindProperty("textCurrentLevel");
         }
 
         public override void OnInspectorGUI()
@@ -33,6 +35,8 @@ namespace ButchersGames
             }
 
             EditorGUILayout.PropertyField(_lvlList);
+            EditorGUILayout.PropertyField(_playerController);
+            EditorGUILayout.PropertyField(_textCurrentLevel);
 
             serializedObject.ApplyModifiedProperties();
 

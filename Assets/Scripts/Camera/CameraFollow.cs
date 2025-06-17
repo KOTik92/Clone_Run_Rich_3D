@@ -24,7 +24,7 @@ public class CameraFollow : MonoBehaviour
         transform.rotation = _targetRotation;
     }
 
-    private void FixedUpdate()
+    private void LateUpdate()
     {
         if (playerTarget == null) return;
         

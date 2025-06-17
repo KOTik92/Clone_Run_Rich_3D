@@ -13,4 +13,8 @@ MonoBehaviour:
   m_Name: New Levels List
   m_EditorClassIdentifier: 
   randomizedLvls: 0
-  lvls: []
+  lvls:
+  - {fileID: 3307753146067309320, guid: d106c6fb99a176c4b80bf8ebef50726c, type: 3}
+  - {fileID: 3307753146067309320, guid: d106c6fb99a176c4b80bf8ebef50726c, type: 3}
+  - {fileID: 3307753146067309320, guid: d106c6fb99a176c4b80bf8ebef50726c, type: 3}
+  - {fileID: 3307753146067309320, guid: d106c6fb99a176c4b80bf8ebef50726c, type: 3}
