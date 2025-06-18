@@ -23,7 +23,6 @@ public class PlayerMovement
     private float _currentRotationAngle;
     private Vector3 _rotationCenter;
     private Quaternion _startRotation;
-    private bool _shouldResetTilt;
     private Transform _transform;
     private Animator _animator;
 
@@ -32,7 +31,6 @@ public class PlayerMovement
         _transform = transform;
         _animator = animator;
         _targetXPosition = 0;
-        _shouldResetTilt = false;
 
         Vector3 newPos = new Vector3(
             _transform.position.x, 
@@ -51,7 +49,6 @@ public class PlayerMovement
     {
         MovePlayer();
         HandleInput();
-        HandleTilt();
     }
     
     private void MovePlayer()
@@ -106,49 +103,31 @@ public class PlayerMovement
     
     private void HandleInput()
     {
-        if (Input.GetMouseButton(0) && !_isDragging)
+        bool isMouseDown = Input.GetMouseButton(0);
+        
+        if (isMouseDown && !_isDragging)
         {
             _dragStartX = Input.mousePosition.x;
-            _shouldResetTilt = false;
             _isDragging = true;
         }
-        else if(!Input.GetMouseButton(0) && _isDragging)
-        {
-            _shouldResetTilt = true;
-            _isDragging = false;
-        }
-
+        
         if (_isDragging)
         {
             _dragDelta = (Input.mousePosition.x - _dragStartX) / Screen.width * 2f * swipeSensitivity;
-            _targetXPosition = Mathf.Clamp(
-                _dragDelta, 
-                -laneDistance, 
-                laneDistance);
+            _targetXPosition = Mathf.Clamp(_dragDelta, -laneDistance, laneDistance);
+            HandleTilt();
+        }
+        
+        if (!isMouseDown)
+        {
+            _isDragging = false;
+            ResetTilt();
         }
     }
 
     private void HandleTilt()
     {
-        float targetTiltAngle;
-        
-        if (_shouldResetTilt)
-        {
-            targetTiltAngle = 0f;
-            if (Mathf.Abs(_animator.transform.localEulerAngles.y) < 0.1f)
-            {
-                _animator.transform.localEulerAngles = new Vector3(
-                    _animator.transform.localEulerAngles.x,
-                    0,
-                    _animator.transform.localEulerAngles.z);
-                
-                _shouldResetTilt = false;
-            }
-        }
-        else
-        {
-            targetTiltAngle = maxTiltAngle * (_targetXPosition / laneDistance);
-        }
+        float targetTiltAngle = maxTiltAngle * (_targetXPosition / laneDistance);
         
         float currentTiltAngle = _animator.transform.localEulerAngles.y;
         if (currentTiltAngle > 180) currentTiltAngle -= 360f;
@@ -161,6 +140,32 @@ public class PlayerMovement
         _animator.transform.localEulerAngles = new Vector3(
             _animator.transform.localEulerAngles.x, 
             newTiltAngle, 
+            _animator.transform.localEulerAngles.z);
+    }
+    
+    private void ResetTilt()
+    {
+        float currentTiltAngle = _animator.transform.localEulerAngles.y;
+        
+        if (currentTiltAngle > 180f) currentTiltAngle -= 360f;
+        
+        if (Mathf.Abs(currentTiltAngle) < 0.5f)
+        {
+            _animator.transform.localEulerAngles = new Vector3(
+                _animator.transform.localEulerAngles.x,
+                0f,
+                _animator.transform.localEulerAngles.z);
+            return;
+        }
+        
+        float newTiltAngle = Mathf.Lerp(
+            currentTiltAngle,
+            0f,
+            tiltSpeed * Time.deltaTime);
+        
+        _animator.transform.localEulerAngles = new Vector3(
+            _animator.transform.localEulerAngles.x,
+            newTiltAngle,
             _animator.transform.localEulerAngles.z);
     }
 
