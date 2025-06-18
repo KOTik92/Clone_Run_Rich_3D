@@ -130,6 +130,8 @@ namespace ButchersGames
             {
                 Level lev = Instantiate(level, transform);
                 playerController.transform.position = lev.PlayerSpawnPoint.position;
+                playerController.transform.rotation = lev.PlayerSpawnPoint.rotation;
+                playerController.Init();
             }
             else
             {
@@ -138,6 +140,7 @@ namespace ButchersGames
 #else
                 Level lev = Instantiate(level, transform);
                 playerController.transform.position = lev.PlayerSpawnPoint.position;
+                playerController.Init();
 #endif
             }
         }

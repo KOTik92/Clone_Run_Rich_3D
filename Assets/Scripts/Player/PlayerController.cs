@@ -7,13 +7,34 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerMovement playerMovement = new PlayerMovement();
     [SerializeField] private PlayerLevel playerLevel = new PlayerLevel();
     [SerializeField] private Image tutor;
+    [Space] 
+    [SerializeField] private UILose uiLose;
+    [SerializeField] private UIWin uiWin;
 
     private bool _isMove;
 
-    private void Awake()
+    public void Init()
     {
+        _isMove = false;
+        animator.SetBool("Lose", false);
+        animator.SetBool("Move", false);
+        animator.SetBool("Win", false);
+        uiLose.Deactivate();
+        uiWin.Deactivate();
         playerMovement.Init(transform, animator);
         playerLevel.Init(animator);
+        playerLevel.CanvasProgress.gameObject.SetActive(false);
+        tutor.gameObject.SetActive(true);
+    }
+
+    private void OnEnable()
+    {
+        playerLevel.OnLose += Lose;
+    }
+
+    private void OnDisable()
+    {
+        playerLevel.OnLose -= Lose;
     }
 
     private void Update()
@@ -34,7 +55,24 @@ public class PlayerController : MonoBehaviour
     private void StartGame()
     {
         tutor.gameObject.SetActive(false);
+        playerLevel.CanvasProgress.gameObject.SetActive(true);
         _isMove = true;
+    }
+
+    private void Lose()
+    {
+        _isMove = false;
+        animator.SetBool("Lose", true);
+        playerLevel.CanvasProgress.gameObject.SetActive(false);
+        uiLose.Activate();
+    }
+
+    private void Win()
+    {
+        _isMove = false;
+        animator.SetBool("Win", true);
+        playerLevel.CanvasProgress.gameObject.SetActive(false);
+        uiWin.Activate();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -60,10 +98,17 @@ public class PlayerController : MonoBehaviour
         {
             checkpoint.Activate();
         }
-    }
-
-    public void Reset()
-    {
-        _isMove = false;
+        
+        if (other.TryGetComponent(out DoorTrigger doorTrigger))
+        {
+            if (playerLevel.CurrentLevel >= doorTrigger.Level)
+            {
+                doorTrigger.Open();
+            }
+            else
+            {
+                Win();
+            }
+        }
     }
 }

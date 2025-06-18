@@ -14,7 +14,8 @@ public struct Levels
 
 [Serializable]
 public class PlayerLevel
-{ 
+{
+    [SerializeField] private Canvas canvasProgress;
     [SerializeField] private Image progressFillImage;
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private Levels[] levels;
@@ -26,6 +27,11 @@ public class PlayerLevel
     [Space] 
     [SerializeField] private ParticleSystem particleAddMoney;
     [SerializeField] private ParticleSystem particleRemoveMoney;
+
+    public event Action OnLose;
+
+    public int CurrentLevel => _currentLevel;
+    public Canvas CanvasProgress => canvasProgress;
     
     private int _currentLevel;
     private int _currentMoney;
@@ -36,7 +42,7 @@ public class PlayerLevel
         _animator = animator;
         _currentLevel = Mathf.Clamp(startingLevel, 0, levels.Length - 1);
         _currentMoney = levels[_currentLevel].minMoney;
-        
+
         UpdateSkinAndAnimation();
         UpdateProgressBar();
     }
@@ -115,9 +121,10 @@ public class PlayerLevel
 
     public void RemoveMoney(int money)
     {
+        if (money <= 0 || IsMinLevel()) return;
+        
         audioSource.PlayOneShot(audioRemoveMoney);
         particleRemoveMoney.Play();
-        if (money <= 0) return;
 
         int newMoney = _currentMoney - money;
         int currentLevelThreshold = levels[_currentLevel].minMoney;
@@ -136,6 +143,12 @@ public class PlayerLevel
                 _currentLevel--;
                 _currentMoney += levels[_currentLevel + 1].minMoney;
             }
+
+            if (_currentLevel < 0)
+            {
+                OnLose?.Invoke();
+                return;
+            }
             
             UpdateSkinAndAnimation();
         }
@@ -144,5 +157,5 @@ public class PlayerLevel
     }
     
     private bool IsMaxLevel() => _currentLevel >= levels.Length - 1;
-    private bool IsMinLevel() => _currentLevel <= 0;
+    private bool IsMinLevel() => _currentLevel < 0;
 }

@@ -31,6 +31,20 @@ public class PlayerMovement
     {
         _transform = transform;
         _animator = animator;
+        _targetXPosition = 0;
+        _shouldResetTilt = false;
+
+        Vector3 newPos = new Vector3(
+            _transform.position.x, 
+            player.transform.position.y, 
+            _transform.position.z);
+
+        player.transform.position = newPos;
+        
+        _animator.transform.localEulerAngles = new Vector3(
+            _animator.transform.localEulerAngles.x, 
+            0, 
+            _animator.transform.localEulerAngles.z);
     }
     
     public void Move()
@@ -59,11 +73,11 @@ public class PlayerMovement
 
         if (_isRotating)
         {
-            HandleRotation();
+            Rotation();
         }
     }
 
-    private void HandleRotation()
+    private void Rotation()
     {
         float rotationStep = rotationSpeed * Time.deltaTime * Mathf.Sign(_targetRotationAngle);
         float remainingAngle = Mathf.Abs(_targetRotationAngle - _currentRotationAngle);
